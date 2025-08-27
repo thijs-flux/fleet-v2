@@ -10,6 +10,6 @@ spec:
     app: soarca
   ports:
     - name: http
-      port: 8080
+      port: 9080
       protocol: TCP
       targetPort: http
