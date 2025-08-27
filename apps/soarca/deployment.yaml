@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: apps
+  name: soarca
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: soarca
+  template:
+    metadata:
+      labels:
+        app: soarca
+    spec:
+      containers:
+        - name: soarca
+          image: docker.io/cossas/soarca:latest
+          ports:
+            - containerPort: 8080
