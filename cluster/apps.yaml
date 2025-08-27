@@ -12,6 +12,5 @@ spec:
   wait: true
   sourceRef:
     kind: GitRepository
-    name: soarca
-    namespace: apps
+    name: flux-system
   path: ./apps/soarca
