@@ -91,6 +91,7 @@ function main() {
         --repository=fleet-v2 \
         --branch=main \
         --personal \
+        --token-auth \
         --path=cluster
 }
 
