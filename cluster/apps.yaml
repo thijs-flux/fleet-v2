@@ -3,14 +3,5 @@ kind: Kustomization
 metadata:
   name: apps
   namespace: flux-system
-spec:
-  interval: 1h
-  path: ./apps
-  prune: true
-  retryInterval: 2m
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  timeout: 5m
-  wait: false
+resources:
+- ../apps
