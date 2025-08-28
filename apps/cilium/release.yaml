@@ -25,9 +25,9 @@ spec:
       ui:
         enabled: true
       peerService:
-        clusterDomain: local.kronform.pius.dev
+        clusterDomain: localhost
     etcd:
-      clusterDomain: local.kronform.pius.dev
+      clusterDomain: localhost
     kubeProxyReplacement: strict
     securityContext:
       capabilities:
@@ -51,5 +51,5 @@ spec:
       autoMount:
         enabled: true
       hostRoot: /sys/fs/cgroup
-    k8sServiceHost: api.kronform.pius.dev
+    k8sServiceHost: localhost
     k8sServicePort: "6443"
