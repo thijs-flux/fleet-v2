@@ -1,38 +1,7 @@
 #!/bin/env bash
 
 export ROOT_DIR="$(git rev-parse --show-toplevel)"
-
-LOG_LEVEL=1
-
-function log() {
-    local lvl="${1:?}" msg="${2:?}"
-    local lvl_n
-    case "$lvl" in
-        "debug")
-            lvl_n=0
-            ;;
-        "info")
-            lvl_n=1
-            ;;
-        "warn")
-            lvl_n=2
-            ;;
-        "error")
-            lvl_n=3
-            ;;
-        *)
-            echo Unknown log level "$lvl"
-            lvl_n=3
-            ;;
-    esac
-    if ((lvl_n>=LOG_LEVEL)); then
-        echo "[${lvl^^}]" "$msg"
-    fi
-    if [[ $lvl == error ]]; then
-        echo "exiting..."
-        exit -1 
-    fi
-}
+source "$ROOT_DIR/scripts/include/log.sh"
 
 # function apply_namespaces() {
 #     log info "Applying namespaces"
@@ -65,24 +34,7 @@ function check() {
 }
 
 function main() {
-    while getopts "hdq:" flag; do
-    case $flag in
-        h) 
-        echo "use -q to suppress info and warning, use -d for debug"
-        exit 0
-        ;;
-        d) 
-        LOG_LEVEL=debug
-        ;;
-        q) 
-        LOG_LEVEL=error
-        ;;
-        \?)
-        echo "invalid option"
-        exit 0
-        ;;
-    esac
-    done
+    set_log_level
     check
     # apply_namespaces
     # apply_apps
