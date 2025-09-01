@@ -11,11 +11,11 @@ spec:
         - name: nfs-client-provisioner
           env:
             - name: NFS_SERVER
-              value: localhost
+              value: 172.27.237.33
             - name: NFS_PATH
               value: /Share
       volumes:
         - name: nfs-client-root
           nfs:
-            server: localhost
+            server: 172.27.237.33
             path: /Share
