@@ -13,9 +13,9 @@ spec:
             - name: NFS_SERVER
               value: localhost
             - name: NFS_PATH
-              value: /
+              value: /Share
       volumes:
         - name: nfs-client-root
           nfs:
             server: localhost
-            path: /
+            path: /Share
