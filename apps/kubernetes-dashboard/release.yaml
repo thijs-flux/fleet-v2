@@ -15,4 +15,4 @@ spec:
         namespace: kubernetes-dashboard
       valuesFiles:
         - values.yaml
-  interval: 1m0s
+      interval: 1m0s
