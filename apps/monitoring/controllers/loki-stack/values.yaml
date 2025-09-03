@@ -4,7 +4,7 @@ loki:
     configs:
       - from: 2024-04-01
         store: tsdb
-        object_store: s3
+        object_store: filesystem
         schema: v13
         index:
           prefix: loki_index_
@@ -25,8 +25,9 @@ loki:
 #        paths:
 #          - path: /
 #            pathType: Prefix
-
-deploymentMode: SimpleScalable
+storage:
+  type: filesystem
+deploymentMode: Distributed
 
 backend:
   replicas: 3
