@@ -4,10 +4,10 @@ metadata:
   name: kubernetes-dashboard
   namespace: kubernetes-dashboard
 spec:
+  interval: 5m
   chart:
     spec:
-      chart: kubernetes-dashoard
-      reconcileStrategy: ChartVersion
+      # chart: kubernetes-dashoard
       version: ">=7.11.0 <7.14.0"
       sourceRef:
         kind: HelmRepository
@@ -16,4 +16,3 @@ spec:
       valuesFiles:
         - values.yaml
       interval: 1m
-  interval: 1m
