@@ -90,3 +90,5 @@ bloomCompactor:
   replicas: 0
 bloomGateway:
   replicas: 0
+ingester_client:
+  remote_timeout: 10s
