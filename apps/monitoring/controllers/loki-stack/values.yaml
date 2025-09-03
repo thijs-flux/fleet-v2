@@ -4,7 +4,7 @@ loki:
     configs:
       - from: 2024-04-01
         store: tsdb
-        object_store: filesystem
+        object_store: s3
         schema: v13
         index:
           prefix: loki_index_
@@ -16,6 +16,19 @@ loki:
   querier:
     # Default is 4, if you have enough memory and CPU you can increase, reduce if OOMing
     max_concurrent: 4
+  storage:
+    type: s3
+    bucketNames:
+      chunks: "chunks"
+      ruler: "ruler"
+      admin: "admin"
+    s3:
+      s3: http://minio-operator:9090
+      endpoint: http://minio-operator:9090
+      accessKeyId: "AIbzZUHczp8q3qsC"
+      secretAccessKey: "ia2YH6QGUZq93fWeiJedNtN3MpCIA4bP"
+      s3ForcePathStyle: true
+      insecure: true
 
 #gateway:
 #  ingress:
@@ -25,8 +38,6 @@ loki:
 #        paths:
 #          - path: /
 #            pathType: Prefix
-storage:
-  type: filesystem
 deploymentMode: Distributed
 
 backend:
