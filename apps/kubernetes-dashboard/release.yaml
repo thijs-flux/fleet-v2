@@ -2,6 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: kubernetes-dashboard
+  namespace: monitoring
 spec:
   interval: 5m
   chart:
@@ -10,7 +11,7 @@ spec:
       version: ">=7.11.0 <7.14.0"
       sourceRef:
         kind: HelmRepository
-        name: kubernetes-dashboard
+        name: monitoring
       valuesFiles:
         - values.yaml
       interval: 1m

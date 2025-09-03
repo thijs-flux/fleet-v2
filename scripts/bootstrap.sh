@@ -36,15 +36,13 @@ function check() {
 function wait_ready() {
     printf "\n"
     while true; do
-        printf "\r"
         kustomizations_total=$(flux get kustomizations -A --no-header | wc -l)
         kustomizations_ready=$(flux get kustomizations -A --no-header --status-selector ready=True | wc -l)
 
         pods_total=$(kubectl get po -A -o custom-columns=READY:.status.phase --no-headers=true | wc -l)
         pods_running=$(kubectl get po -A -o custom-columns=READY:.status.phase --no-headers=true | grep Running | wc -l)
 
-        printf "kustomizations ready: ${kustomizations_ready}/${kustomizations_total}, "
-        printf "pods running: ${pods_running}/${pods_total}"
+        printf "\rkustomizations ready: ${kustomizations_ready}/${kustomizations_total}, pods running: ${pods_running}/${pods_total}"
         if ((kustomizations_ready==kustomizations_total&&pods_running==pods_total)); then break; fi
         sleep 1
     done 
