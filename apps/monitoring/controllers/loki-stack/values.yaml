@@ -48,6 +48,8 @@ loki:
         index:
           prefix: loki_index_
           period: 24h
+        chunks: 
+          period: 2h
   storage:
     type: filesystem
   pattern_ingester:
