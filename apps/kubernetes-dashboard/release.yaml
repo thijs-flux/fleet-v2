@@ -4,15 +4,12 @@ metadata:
   name: kubernetes-dashboard
   namespace: monitoring
 spec:
-  interval: 5m
-  chart:
-    spec:
-      chart: kubernetes-dashoard
-      version: "7.13.0"
-      sourceRef:
-        kind: HelmRepository
-        name: kubernetes-dashboard
-        namespace: monitoring
-      valuesFiles:
-        - values.yaml
-      interval: 1m
+  chart: kubernetes-dashoard
+  version: "7.13.0"
+  sourceRef:
+    kind: HelmRepository
+    name: kubernetes-dashboard
+    namespace: monitoring
+  valuesFiles:
+    - values.yaml
+  interval: 1m
