@@ -52,22 +52,15 @@ function wait_ready() {
 function main() {
     set_log_level
     check
-    local cluster
-    cluster=staging
-    while getopts "p:" flag; do
-    case $flag in
-        p) 
-        cluster=production
-        ;;
-    esac
-    done
+    # apply_namespaces
+    # apply_apps
     flux bootstrap github \
         --owner=thijs-flux \
         --repository=fleet-v2 \
         --branch=main \
         --personal \
         --token-auth \
-        --path=cluster/$cluster
+        --path=cluster
     l=$(log_level)
     if (( l <= 1 )); then
         wait_ready
