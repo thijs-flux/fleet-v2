@@ -1,15 +1,26 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmChart
+metadata:
+  name: kubernetes-dashboard
+  namespace: monitoring
+spec:
+  interval: 10m
+  chart: kubernetes-dashboard
+  sourceRef:
+    kind: HelmRepository
+    name: kubernetes-dashboard
+  version: "7.13.0"
+  valuesFiles:
+    - values.yaml
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: kubernetes-dashboard
   namespace: monitoring
 spec:
-  chart: kubernetes-dashoard
-  version: "7.13.0"
-  sourceRef:
-    kind: HelmRepository
+  interval: 10m
+  chartRef:
+    kind: HelmChart
     name: kubernetes-dashboard
     namespace: monitoring
-  valuesFiles:
-    - values.yaml
-  interval: 1m
