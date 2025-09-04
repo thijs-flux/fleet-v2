@@ -8,4 +8,4 @@ spec:
   # url: https://kubernetes.github.io/dashboard
   url: https://github.com/kubernetes/dashboard
   ref:
-    tag: 7.13.0
+    release: 7.13.0
