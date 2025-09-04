@@ -7,7 +7,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: kubernetes-dashoard
+      chart: kubernetes-dashoard/kubernetes-dashboard
       version: "7.13.0"
       sourceRef:
         kind: HelmRepository
