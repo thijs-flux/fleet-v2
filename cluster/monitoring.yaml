@@ -32,3 +32,19 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./apps/monitoring/configs
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubernetes-dashboard
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 2m
+  timeout: 10m
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/kubernetes-dashboard
