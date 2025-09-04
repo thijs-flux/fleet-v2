@@ -1,55 +1,71 @@
----
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
+test:
+  enabled: false
+# following https://github.com/fluxcd/flux2-monitoring-example/pull/23/files#diff-5e041afacf25eb055565b4a1c32d5b81201ddce29c84adf13a6ae88463e0832b
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: loki-datasource
+      labels:
+        app: loki
+        chart: loki
+        release: loki
+        grafana_datasource: "1"
+        app.kubernetes.io/part-of: kube-prometheus-stack
+    data:
+      loki-datasource.yaml: |-
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy
+          url: http://loki:{{ .Values.loki.server.http_listen_port }}
+          version: 1
+          isDefault: false
 loki:
+  auth_enabled: false
+  serviceMonitor:
+    enabled: true
+    labels:
+      app.kubernetes.io/part-of: kube-prometheus-stack
+  limits_config:
+    allow_structured_metadata: true
+    retention_period: 24h
+    volume_enabled: true
+  # https://grafana.com/docs/loki/latest/setup/install/helm/install-monolithic/
+  commonConfig:
+    replication_factor: 1
   schemaConfig:
     configs:
-      - from: 2024-04-01
+      - from: "2024-04-01"
         store: tsdb
-        object_store: filesystem
+        object_store: s3
         schema: v13
         index:
           prefix: loki_index_
           period: 24h
-  ingester:
-    chunk_encoding: snappy
-  tracing:
+  pattern_ingester:
     enabled: true
-  querier:
-    # Default is 4, if you have enough memory and CPU you can increase, reduce if OOMing
-    max_concurrent: 4
-  storage:
-    type: filesystem
-    chunks_directory: /var/loki/chunks
-    rules_directory: /var/loki/rules
-    bucketNames:
-      chunks: FIXME
-      ruler: FIXME
-      admin: FIXME
-
-#gateway:
-#  ingress:
-#    enabled: true
-#    hosts:
-#      - host: FIXME
-#        paths:
-#          - path: /
-#            pathType: Prefix
-deploymentMode: SimpleScalable
-
-backend:
-  replicas: 3
-read:
-  replicas: 3
-write:
-  replicas: 3
-
-# Enable minio for storage
+  ruler:
+    enable_api: true
 minio:
   enabled: true
-
-# Zero out replica counts of other deployment modes
+lokiCanary:
+  enabled: false
+deploymentMode: SingleBinary
 singleBinary:
+  replicas: 1
+# Zero out replica counts of other deployment modes
+backend:
   replicas: 0
-
+read:
+  replicas: 0
+write:
+  replicas: 0
 ingester:
   replicas: 0
 querier:
