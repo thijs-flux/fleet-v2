@@ -18,8 +18,12 @@ loki:
     max_concurrent: 4
   storage:
     type: filesystem
+    chunks_directory: /var/loki/chunks
+    rules_directory: /var/loki/rules
     bucketNames:
-      chunks: loki-chunks
+      chunks: FIXME
+      ruler: FIXME
+      admin: FIXME
 
 #gateway:
 #  ingress:
