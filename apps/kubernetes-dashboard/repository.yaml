@@ -5,7 +5,4 @@ metadata:
   namespace: monitoring
 spec:
   interval: 5m0s
-  # url: https://kubernetes.github.io/dashboard
-  url: https://github.com/kubernetes/dashboard
-  ref:
-    branch: master
+  url: https://kubernetes.github.io/dashboard
