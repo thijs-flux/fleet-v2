@@ -10,7 +10,7 @@ spec:
       chart: kubernetes-dashoard/kubernetes-dashboard
       version: "7.13.0"
       sourceRef:
-        kind: HelmRepository
+        kind: GitRepository
         name: kubernetes-dashboard
         namespace: monitoring
       valuesFiles:

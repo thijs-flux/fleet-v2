@@ -1,8 +1,11 @@
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
+kind: GitRepository
 metadata:
   name: kubernetes-dashboard
   namespace: monitoring
 spec:
   interval: 5m0s
-  url: https://kubernetes.github.io/dashboard
+  # url: https://kubernetes.github.io/dashboard
+  url: https://github.com/kubernetes/dashboard
+  ref:
+    tag: 7.13.0
