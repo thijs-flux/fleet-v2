@@ -2,6 +2,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: soarca-doc-gateway
+  namespace: networking
 spec:
   gatewayClassName: soarca-doc-class
   listeners:
@@ -13,5 +14,6 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
   name: soarca-doc-class
+  namespace: networking
 spec:
   controllerName: soarcadoc.com/gateway-controller
