@@ -49,11 +49,17 @@ function wait_ready() {
 
 }
 
+function apply_crd() {
+    kubectl get crd gateways.gateway.networking.k8s.io || 
+        kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml ||
+        log error "Could not get gateway crd"
+
+}
+
 function main() {
     set_log_level
     check
-    # apply_namespaces
-    # apply_apps
+    apply_crd
     flux bootstrap github \
         --owner=thijs-flux \
         --repository=fleet-v2 \

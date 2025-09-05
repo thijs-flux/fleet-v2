@@ -1,0 +1,17 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: soarca-doc-gateway
+spec:
+  gatewayClassName: soarca-doc-class
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: soarca-doc-class
+spec:
+  controllerName: soarcadoc.com/gateway-controller

@@ -1,0 +1,59 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: istio
+  namespace: networking
+spec:
+  interval: 5m0s
+  url: https://istio-release.storage.googleapis.com/charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmChart
+metadata:
+  name: istio-base
+  namespace: networking
+spec:
+  interval: 10m
+  chart: base
+  sourceRef:
+    kind: HelmRepository
+    name: istio
+  version: "1.27"
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-base
+  namespace: networking
+spec:
+  interval: 5m
+  chartRef:
+    kind: HelmChart
+    name: istio-base
+    namespace: networking
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmChart
+metadata:
+  name: istio-control
+  namespace: networking
+spec:
+  interval: 10m
+  chart: istiod
+  sourceRef:
+    kind: HelmRepository
+    name: istio
+  version: "1.27"
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-control
+  namespace: networking
+spec:
+  interval: 5m
+  chartRef:
+    kind: HelmChart
+    name: istio-control
+    namespace: networking

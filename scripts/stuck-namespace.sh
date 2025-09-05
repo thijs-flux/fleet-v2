@@ -1,7 +1,7 @@
 #!/bin/env bash
-kubectl get namespace "flux-system" -o json \
+kubectl get namespace "$1" -o json \
   | tr -d "\n" | sed "s/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/" \
-  | kubectl replace --raw /api/v1/namespaces/flux-system/finalize -f -
+  | kubectl replace --raw /api/v1/namespaces/$1/finalize -f -
 
 crds=$(kubectl get crd -o name | grep "flux")
 for crd in $crds; do
