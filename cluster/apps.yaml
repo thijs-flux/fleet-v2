@@ -2,7 +2,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: soarca
+  name: apps
   namespace: flux-system
 spec:
   interval: 1h
@@ -13,12 +13,12 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./apps/soarca
+  path: ./apps
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cilium
+  name: networking
   namespace: flux-system
 spec:
   interval: 1h
@@ -29,4 +29,4 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./apps/cilium
+  path: ./networking
