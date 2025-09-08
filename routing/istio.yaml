@@ -87,3 +87,57 @@ spec:
     kind: HelmChart
     name: istio-control
     namespace: networking
+  values:
+    profile: "ambient"
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmChart
+metadata:
+  name: istio-cni
+  namespace: networking
+spec:
+  interval: 10m
+  chart: cni
+  sourceRef:
+    kind: HelmRepository
+    name: istio
+  version: "1.27"
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-cni
+  namespace: networking
+spec:
+  interval: 5m
+  chartRef:
+    kind: HelmChart
+    name: istio-cni
+    namespace: networking
+  values:
+    profile: "ambient"
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmChart
+metadata:
+  name: istio-ztunnel
+  namespace: networking
+spec:
+  interval: 10m
+  chart: ztunnel
+  sourceRef:
+    kind: HelmRepository
+    name: istio
+  version: "1.27"
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-ztunnel
+  namespace: networking
+spec:
+  interval: 5m
+  chartRef:
+    kind: HelmChart
+    name: istio-ztunnel
+    namespace: networking
