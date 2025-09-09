@@ -3,4 +3,3 @@ kind: Kustomization
 resources:
 - gateway.yaml
 - http-route.yaml
-- istio.yaml

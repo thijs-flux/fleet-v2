@@ -16,4 +16,4 @@ metadata:
   name: soarca-doc-class
   namespace: networking
 spec:
-  controllerName: istio.io/gateway-controller
+  controllerName: cilium.io/gateway-controller
