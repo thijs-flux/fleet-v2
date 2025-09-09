@@ -6,7 +6,7 @@ source "$ROOT_DIR/scripts/include/log.sh"
 
 function main() {
     set_log_level
-    minikube start
+    minikube start --nodes 2
     log info "Minikube started"
 }
 

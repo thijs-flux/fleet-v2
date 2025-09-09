@@ -40,7 +40,7 @@ spec:
         clusterDomain: localhost
     etcd:
       clusterDomain: localhost
-    kubeProxyReplacement: true
+    kubeProxyReplacement: strict
     securityContext:
       capabilities:
         ciliumAgent:
