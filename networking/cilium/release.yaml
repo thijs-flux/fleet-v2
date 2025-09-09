@@ -9,7 +9,7 @@ spec:
   chart: cilium
   sourceRef:
     kind: HelmRepository
-    name: ciliium
+    name: cilium
   version: "1.18"
   valuesFiles:
     - values.yaml
