@@ -32,18 +32,12 @@ resource "minikube_cluster" "docker" {
   driver       = "docker"
   cluster_name = "minikube"
   nodes        = var.nodes
-  static_ip    = var.cluster_ip
 }
 
 variable "nodes" {
   description = "The amount of nodes in the cluster"
   type        = number
   default     = 1
-}
-variable "cluster_ip" {
-  description = "The static ip of the cluster"
-  type        = string
-  default     = "192.168.58.2"
 }
 
 provider "flux" {
