@@ -1,3 +1,7 @@
+### Installation
+
+
+
 ### Repository layout
 
 # /cluster
@@ -20,6 +24,9 @@ Utility scripts
 Deployments that are not part of the cluster, but which are useful for debugging/testing during development.
 
 ### Troubleshooting
+
+## Debugging script
+scripts/debug.sh looks through some common resources and lists those that are not up. By all means add more if any others prove problematic.
 
 ## Changing gateway classes
 The gateway class cannot be changed by flux reconciliation; it will report an imutable value: string of some kind. 

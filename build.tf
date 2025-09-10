@@ -1,49 +1,67 @@
-terraform{
-    required_version = ">= 1.7"
-    required_providers {
-        minikube = {
-            source = "scott-the-programmer/minikube"
-            version = "~> 0.5"
-        }
-        flux = {
-            source = "fluxcd/flux"
-            version = "1.6.4"
-        }
-        github = {
-            source  = "integrations/github"
-            version = ">= 6.1"
-        }
+terraform {
+  required_version = ">= 1.7"
+  required_providers {
+    minikube = {
+      source  = "scott-the-programmer/minikube"
+      version = "~> 0.5"
     }
+    flux = {
+      source  = "fluxcd/flux"
+      version = "1.6.4"
+    }
+    github = {
+      source  = "integrations/github"
+      version = ">= 6.1"
+    }
+    kubectl = {
+      # The official kubernetes provider requires the cluster to be up before planning,
+      # so use the kubectl one (which can fail at applying).
+      source  = "gavinbunney/kubectl"
+      version = "1.19.0"
+    }
+    http = {
+      source = "hashicorp/http"
+    }
+
+  }
 }
 provider "minikube" {
-    kubernetes_version = "v1.30.0"
+  kubernetes_version = "v1.33.0"
 }
 resource "minikube_cluster" "docker" {
-    driver       = "docker"
-    cluster_name = "tcluster"
-    nodes = var.nodes
+  driver       = "docker"
+  cluster_name = "minikube"
+  nodes        = var.nodes
+  static_ip    = var.cluster_ip
 }
 
 variable "nodes" {
-    description = "The amount of nodes in the cluster"
-    type = number
-    default = 1
+  description = "The amount of nodes in the cluster"
+  type        = number
+  default     = 1
+}
+variable "cluster_ip" {
+  description = "The static ip of the cluster"
+  type        = string
+  default     = "192.168.58.2"
 }
 
 provider "flux" {
-    kubernetes = {
-        host                   = minikube_cluster.docker.host
-        client_certificate     = minikube_cluster.docker.client_certificate
-        client_key             = minikube_cluster.docker.client_key
-        cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
+  kubernetes = {
+    host                   = minikube_cluster.docker.host
+    client_certificate     = minikube_cluster.docker.client_certificate
+    client_key             = minikube_cluster.docker.client_key
+    cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
+  }
+  git = {
+    url    = "https://github.com/${var.github_org}/${var.github_repository}.git"
+    branch = "main"
+
+    http = {
+      username = "git" # This can be any string when using a personal access token
+      password = var.github_token
     }
-    git = {
-        url = "https://github.com/${var.github_org}/${var.github_repository}.git"
-        http = {
-        username = "git" # This can be any string when using a personal access token
-        password = var.github_token
-        }
-    }
+  }
 }
 variable "github_token" {
   description = "GitHub token"
@@ -64,15 +82,37 @@ variable "github_repository" {
   default     = "fleet-v2"
 }
 
-resource "github_repository" "this" {
-  name        = var.github_repository
-  description = var.github_repository
-  visibility  = "private"
-  auto_init   = true # This is extremely important as flux_bootstrap_git will not work without a repository that has been initialised
-}
 
 resource "flux_bootstrap_git" "this" {
-  depends_on = [github_repository.this,minikube_cluster.docker]
+  depends_on         = [minikube_cluster.docker, kubectl_manifest.gateway-crd]
   embedded_manifests = true
   path               = "cluster"
+}
+
+data "http" "gateway-crd" {
+  url = "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml "
+  request_headers = {
+    Accept = "text/plain"
+  }
+}
+
+locals {
+  gateway-crds-raw = [for d in split("---", data.http.gateway-crd.response_body) : d]
+  # The remote file contains a information header before the first ---, which gets treated as an empty yaml object which kubectl_manifest can't handle
+  gateway-crds     = slice(local.gateway-crds-raw, 1, length(local.gateway-crds-raw))
+}
+resource "kubectl_manifest" "gateway-crd" {
+  depends_on = [minikube_cluster.docker]
+  count      = length(local.gateway-crds)
+  yaml_body  = local.gateway-crds[count.index]
+}
+
+
+provider "kubectl" {
+  host = minikube_cluster.docker.host
+
+  client_certificate     = minikube_cluster.docker.client_certificate
+  client_key             = minikube_cluster.docker.client_key
+  cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
+  load_config_file       = false
 }
