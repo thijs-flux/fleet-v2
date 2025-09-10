@@ -1,2 +1,5 @@
 token
 bin/
+.terraform.*
+.terraform/
+terraform.tfstate
