@@ -1,6 +1,15 @@
 ### Installation
 
+Use terraform. The alternative is to set up a cluster manually, and use scripts/bootstrap.sh. 
 
+Sample command: `terraform apply -var "nodes=2" -var "github_token=$(cat token)"`
+
+Terraform variables:
+# nodes
+The amount of nodes in the minikube cluster
+
+# github_token
+The github token for authentication. If this is not set flux will fail.
 
 ### Repository layout
 
@@ -34,3 +43,8 @@ Solution: delete the gatewayclass (kubectl delete -n networking ...) and reapply
 
 ## Resources stuck terminating
 Sometimes resources get stuck in the status "Terminating"; this mainly applies to namespaces. Use scrips/stuck-namespace.sh to attempt a fix. Only do this after you are VERY sure that it's stuck and not just taking a long time.
+
+## Terraform errors at startup 
+If starting from a clean slate (i.e. no cluster deployed) make sure to delete the terraform state, i.e. `rm terraform.tfstate`, and `terraform init`. 
+If the state suggests a cluster exists the kubectl provider will try to work with the kube api (which does not exist without a cluster) or otherwise contact non-existing sockets.
+This can happen when powering down the machine (and thus the cluster) without destroying the terraform state properly (i.e. `terraform destroy -var ...` with the same variables as starting the cluster).
