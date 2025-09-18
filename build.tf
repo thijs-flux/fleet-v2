@@ -22,6 +22,10 @@ terraform {
     http = {
       source = "hashicorp/http"
     }
+    helm = {
+      source = "hashicorp/helm"
+      version = "3.0.2"
+    }    
 
   }
 }
@@ -33,29 +37,85 @@ resource "minikube_cluster" "docker" {
   cluster_name = "minikube"
   nodes        = var.nodes
 }
+provider "kubernetes" {
+  host = minikube_cluster.docker.host
+  client_certificate =  minikube_cluster.docker.client_certificate
+  client_key = minikube_cluster.docker.client_key
+  cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
+}
+provider "helm" {
+  kubernetes = {
+    host = minikube_cluster.docker.host
+    client_certificate =  minikube_cluster.docker.client_certificate
+    client_key = minikube_cluster.docker.client_key
+    cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
+  }
+  
+}
+provider "kubectl" {
+  host = minikube_cluster.docker.host
+
+  client_certificate     = minikube_cluster.docker.client_certificate
+  client_key             = minikube_cluster.docker.client_key
+  cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
+  load_config_file       = false
+}
+
 
 variable "nodes" {
   description = "The amount of nodes in the cluster"
   type        = number
   default     = 1
 }
+# provider "flux" {
+#   kubernetes = {
+#     host                   = minikube_cluster.docker.host
+#     client_certificate     = minikube_cluster.docker.client_certificate
+#     client_key             = minikube_cluster.docker.client_key
+#     cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
+#   }
+#   git = {
+#     url    = "https://github.com/${var.github_org}/${var.github_repository}.git"
+#     branch = "main"
 
-provider "flux" {
-  kubernetes = {
-    host                   = minikube_cluster.docker.host
-    client_certificate     = minikube_cluster.docker.client_certificate
-    client_key             = minikube_cluster.docker.client_key
-    cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
-  }
-  git = {
-    url    = "https://github.com/${var.github_org}/${var.github_repository}.git"
-    branch = "main"
+#     http = {
+#       username = "git" # This can be any string when using a personal access token
+#       password = var.github_token
+#     }
+#   }
+# }
+// Create the  flux-system namespace.
+# resource "kubernetes_namespace" "flux_system" {
+#   metadata {
+#     name = "flux-system"
+#   }
+#   lifecycle {
+#     ignore_changes = [metadata]
+#   }
+# }
+resource "helm_release" "flux_operator" {
+  depends_on = [minikube_cluster.docker]
 
-    http = {
-      username = "git" # This can be any string when using a personal access token
-      password = var.github_token
-    }
+  name       = "flux-operator"
+  namespace  = "flux-system"
+  repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
+  chart      = "flux-operator"
+  wait       = true
+}
+resource "kubernetes_secret" "token" {
+  metadata {
+    name = "git-token"
   }
+  data = {
+    username = "thijs-flux"
+    password = "git-token"
+  }
+
+}
+resource "kubectl_manifest" "flux" {
+  depends_on = [helm_release.flux_operator, kubectl_manifest.gateway-crd, kubernetes_secret.token]
+  yaml_body = file("${path.module}/cluster/flux.yaml")
+  
 }
 variable "github_token" {
   description = "GitHub token"
@@ -64,24 +124,24 @@ variable "github_token" {
   default     = ""
 }
 
-variable "github_org" {
-  description = "GitHub organization"
-  type        = string
-  default     = "thijs-flux"
-}
+# variable "github_org" {
+#   description = "GitHub organization"
+#   type        = string
+#   default     = "thijs-flux"
+# }
 
-variable "github_repository" {
-  description = "GitHub repository"
-  type        = string
-  default     = "fleet-v2"
-}
+# variable "github_repository" {
+#   description = "GitHub repository"
+#   type        = string
+#   default     = "fleet-v2"
+# }
 
 
-resource "flux_bootstrap_git" "this" {
-  depends_on         = [minikube_cluster.docker, kubectl_manifest.gateway-crd]
-  embedded_manifests = true
-  path               = "cluster"
-}
+# resource "flux_bootstrap_git" "this" {
+#   depends_on         = [minikube_cluster.docker, kubectl_manifest.gateway-crd]
+#   embedded_manifests = true
+#   path               = "cluster"
+# }
 
 data "http" "gateway-crd" {
   url = "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml "
@@ -102,11 +162,3 @@ resource "kubectl_manifest" "gateway-crd" {
 }
 
 
-provider "kubectl" {
-  host = minikube_cluster.docker.host
-
-  client_certificate     = minikube_cluster.docker.client_certificate
-  client_key             = minikube_cluster.docker.client_key
-  cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
-  load_config_file       = false
-}
