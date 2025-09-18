@@ -1,20 +1,23 @@
 ### Installation
 
-Use terraform. The alternative is to set up a cluster manually, and use scripts/bootstrap.sh. 
+Use terraform. There are some old scripts for manual bootstrapping, but these do not work with the flux operator.
 
-Sample command: `terraform apply -var "nodes=2" -var "github_token=$(cat token)"`
+Sample command: `terraform apply -var "nodes=2"
 
 Terraform variables:
 # nodes
 The amount of nodes in the minikube cluster
 
-# github_token
-The github token for authentication. If this is not set flux will fail.
+You also need a GITHUB_TOKEN environment variable set.
+
+It may take some time for flux to fully apply all configs. If you see errors around L2Advertisement CRD not being available,
+just wait a bit as this should be smoothed out by a hack in the terraform (the terraform flux provider cannot handle resources
+introducing CRDs and using them at the same time).
 
 ### Repository layout
 
 # /cluster
-Flux files and main cluster definitions. These are hard to move, as flux is somewhat unwieldy about this. cluster.yaml lists all the other directories. namespaces.yaml contains all namespaces.
+Flux file and main cluster definitions. flux.yaml gets loaded directly by terraform, which should bootstrap all other files.
 # /apps
 Apps in the cluster
 # /monitoring
@@ -22,11 +25,11 @@ Monitoring apps
 # /networking
 Cilium and other networking components
 # /routing
-Gateway definitions and such
+Gateway definitions and such. Should be independent of the underlying netwokring components.
 # /nfs
 Persistent storage setup
 # /cluster-policies
-Policies used by cilium
+Policies used by cilium and such
 # /scripts
 Utility scripts
 # /test-deployments
@@ -48,3 +51,4 @@ Sometimes resources get stuck in the status "Terminating"; this mainly applies t
 If starting from a clean slate (i.e. no cluster deployed) make sure to delete the terraform state, i.e. `rm terraform.tfstate`, and `terraform init`. 
 If the state suggests a cluster exists the kubectl provider will try to work with the kube api (which does not exist without a cluster) or otherwise contact non-existing sockets.
 This can happen when powering down the machine (and thus the cluster) without destroying the terraform state properly (i.e. `terraform destroy -var ...` with the same variables as starting the cluster).
+These errors can list some addresses being unavailable, or some GRPC provider error.
