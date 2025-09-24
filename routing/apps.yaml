@@ -30,4 +30,4 @@ spec:
         value: /soarca
     backendRefs:
     - name: soarca-doc
-      port: 31313
+      port: 80

@@ -18,7 +18,7 @@ spec:
           image: soarcadoc:latest 
           imagePullPolicy: Never
           command: ["server"]
-          args: ["-s","/src/docs","-D","--bind","0.0.0.0","--port","31313"]
+          args: ["-s","/src/docs","-D","--bind","0.0.0.0","--port","80"]
           ports: 
             - containerPort: 31313
               name: soarca-doc-port

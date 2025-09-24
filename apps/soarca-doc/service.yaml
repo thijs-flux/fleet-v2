@@ -9,6 +9,6 @@ spec:
     app: soarca-doc
   ports:
     - name: soarca-doc-http
-      port: 31313
+      port: 80
       protocol: TCP
       targetPort: soarca-doc-port
