@@ -12,3 +12,4 @@ spec:
   nfs:
     server: 192.168.67.1
     path: "/Share"
+  claimRef: null
