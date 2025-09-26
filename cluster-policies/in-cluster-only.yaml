@@ -30,8 +30,8 @@ spec:
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: isolate-dashboards
-  namespace: dashboards
+  name: isolate-monitoring
+  namespace: monitoring
 spec:
   endpointSelector:
     matchLabels:
