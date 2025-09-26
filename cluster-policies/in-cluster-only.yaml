@@ -11,7 +11,9 @@ spec:
   ingress:
   - fromEndpoints:
     - matchLabels:
-        {}
+        kind: HTTPRoute
+    - matchLabels:
+        kind: Gateway
 ---
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
@@ -25,7 +27,9 @@ spec:
   ingress:
   - fromEndpoints:
     - matchLabels:
-        {}
+        kind: HTTPRoute
+    - matchLabels:
+        kind: Gateway
 ---
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
@@ -39,7 +43,9 @@ spec:
   ingress:
   - fromEndpoints:
     - matchLabels:
-        {}
+        kind: HTTPRoute
+    - matchLabels:
+        kind: Gateway
 ---
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
@@ -53,7 +59,9 @@ spec:
   ingress:
   - fromEndpoints:
     - matchLabels:
-        {}
+        kind: HTTPRoute
+    - matchLabels:
+        kind: Gateway
 ---
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
@@ -67,4 +75,6 @@ spec:
   ingress:
   - fromEndpoints:
     - matchLabels:
-        {}
+        kind: HTTPRoute
+    - matchLabels:
+        kind: Gateway
