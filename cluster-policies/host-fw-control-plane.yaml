@@ -27,7 +27,7 @@ spec:
   description: "flux-plane specific access rules."
   endpointSelector:
     matchLabels:
-      - {}
+      {}
   ingress:
   - fromEntities:
     - world
