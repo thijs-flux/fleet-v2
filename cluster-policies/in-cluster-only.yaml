@@ -1,0 +1,70 @@
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: isolate-apps
+  namespace: apps
+spec:
+  endpointSelector:
+    matchLabels:
+      {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        {}
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: isolate-networking
+  namespace: networking
+spec:
+  endpointSelector:
+    matchLabels:
+      {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        {}
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: isolate-dashboards
+  namespace: dashboards
+spec:
+  endpointSelector:
+    matchLabels:
+      {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        {}
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: isolate-nfs
+  namespace: nfs-provisioner
+spec:
+  endpointSelector:
+    matchLabels:
+      {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        {}
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: isolate-default
+  namespace: default
+spec:
+  endpointSelector:
+    matchLabels:
+      {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        {}

@@ -1,4 +1,4 @@
-# policies/host-fw-control-plane.yaml
+---
 apiVersion: "cilium.io/v2"
 kind: CiliumClusterwideNetworkPolicy
 metadata:
@@ -16,4 +16,23 @@ spec:
     toPorts:
     - ports:
       - port: "8443"
+        protocol: "TCP"
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "host-fw-flux"
+  namespace: flux-system
+spec:
+  description: "flux-plane specific access rules."
+  nodeSelector:
+    matchLabels:
+      - {}
+  ingress:
+  - fromEntities:
+    - world
+    - cluster
+    toPorts:
+    - ports:
+      - port: "8080"
         protocol: "TCP"
