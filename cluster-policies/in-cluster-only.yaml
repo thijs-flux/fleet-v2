@@ -1,80 +1,45 @@
 ---
 apiVersion: "cilium.io/v2"
-kind: CiliumNetworkPolicy
+kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: isolate-apps
-  namespace: apps
+  name: deny-ingress
 spec:
   endpointSelector:
     matchLabels:
       {}
   ingress:
-  - fromEndpoints:
-    - matchLabels:
-        kind: HTTPRoute
-    - matchLabels:
-        kind: Gateway
+    - fromEntities:
+      - kube-apiserver
+    - fromEndpoints:
+      - matchLabels:
+          namespace: flux-system
+    - fromEndpoints:
+      - matchLabels:
+          namespace: kube-system
+  ingressDeny:
+    - fromEntities:
+      - world
 ---
 apiVersion: "cilium.io/v2"
-kind: CiliumNetworkPolicy
+kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: isolate-networking
-  namespace: networking
+  name: allow-external-access
 spec:
   endpointSelector:
     matchLabels:
-      {}
+      reachable: "external"
   ingress:
-  - fromEndpoints:
-    - matchLabels:
-        kind: HTTPRoute
-    - matchLabels:
-        kind: Gateway
+  - fromEntities:
+    - world
 ---
 apiVersion: "cilium.io/v2"
-kind: CiliumNetworkPolicy
+kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: isolate-monitoring
-  namespace: monitoring
+  name: allow-cluster-access
 spec:
   endpointSelector:
     matchLabels:
-      {}
+      reachable: "cluster"
   ingress:
-  - fromEndpoints:
-    - matchLabels:
-        kind: HTTPRoute
-    - matchLabels:
-        kind: Gateway
----
-apiVersion: "cilium.io/v2"
-kind: CiliumNetworkPolicy
-metadata:
-  name: isolate-nfs
-  namespace: nfs-provisioner
-spec:
-  endpointSelector:
-    matchLabels:
-      {}
-  ingress:
-  - fromEndpoints:
-    - matchLabels:
-        kind: HTTPRoute
-    - matchLabels:
-        kind: Gateway
----
-apiVersion: "cilium.io/v2"
-kind: CiliumNetworkPolicy
-metadata:
-  name: isolate-default
-  namespace: default
-spec:
-  endpointSelector:
-    matchLabels:
-      {}
-  ingress:
-  - fromEndpoints:
-    - matchLabels:
-        kind: HTTPRoute
-    - matchLabels:
-        kind: Gateway
+  - fromEntities:
+    - cluster
