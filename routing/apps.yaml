@@ -31,3 +31,10 @@ spec:
     backendRefs:
     - name: soarca-doc
       port: 80
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /teapot
+    backendRefs:
+    - name: nginx-svc
+      port: 80
