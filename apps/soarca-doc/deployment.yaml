@@ -20,7 +20,7 @@ spec:
           command: ["server"]
           args: ["-s","/src/docs","-D","--bind","0.0.0.0","--port","80"]
           ports: 
-            - containerPort: 31313
+            - containerPort: 80
               name: soarca-doc-port
       volumes:
       - name: volv
