@@ -21,7 +21,7 @@ metadata:
   namespace: apps
 spec:
   parentRefs:
-    - name: soarca-doc-gateway
+    - name: apps-gateway
       namespace: apps
   rules:
   - matches:
