@@ -64,3 +64,6 @@ spec:
   egress:
   - toCIDR:
     - 192.168.67.2/24
+  ingress:
+  - fromCIDR:
+    - 192.168.67.2/24
