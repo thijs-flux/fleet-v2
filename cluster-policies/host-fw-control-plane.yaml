@@ -64,3 +64,6 @@ spec:
   egress:
   - toEntities:
     - world
+  ingress:
+  - fromEntities:
+    - world
