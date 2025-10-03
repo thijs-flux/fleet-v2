@@ -43,3 +43,17 @@ spec:
   ingress:
   - fromEntities:
     - cluster
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: monitoring
+  namespace: monitoring
+spec:
+  endpointSelector:
+    matchLabels:
+      {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        component: monitoring

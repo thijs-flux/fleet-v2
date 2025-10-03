@@ -36,3 +36,31 @@ spec:
     - ports:
       - port: "8080"
         protocol: "TCP"
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "kube-system-allow"
+  namespace: kube-system
+spec:
+  description: "flux-plane specific access rules."
+  endpointSelector:
+    matchLabels:
+      {}
+  ingress:
+  - fromEntities:
+    - cluster
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "nfs-allow"
+  namespace: nfs-provisioner
+spec:
+  description: "nfs specific access rules."
+  endpointSelector:
+    matchLabels:
+      {}
+  egress:
+  - toEntities:
+    - world
