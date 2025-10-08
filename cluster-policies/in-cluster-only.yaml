@@ -38,6 +38,10 @@ spec:
   - toEndpoints:
     - matchLabels:
         k8s:io.kubernetes.pod.namespace: apps
+  - toEndpoints:
+      - matchLabels:
+          "k8s:io.kubernetes.pod.namespace": kube-system
+          "k8s:k8s-app": kube-dns
   ingress:
   - fromEndpoints:
     - matchLabels:
