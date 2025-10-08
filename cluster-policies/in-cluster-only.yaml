@@ -6,7 +6,8 @@ metadata:
   namespace: monitoring
 spec:
   endpointSelector:
-    matchLabels: {}
+    matchLabels: 
+      k8s:io.kubernetes.pod.namespace: monitoring
   egress:
   - toEndpoints:
     - matchLabels:
