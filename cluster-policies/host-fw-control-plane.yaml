@@ -50,6 +50,21 @@ spec:
   ingress:
   - fromEntities:
     - cluster
+    - host
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "networking-allow"
+  namespace: networking
+spec:
+  endpointSelector:
+    matchLabels:
+      {}
+  ingress:
+  - fromEntities:
+    - cluster   
+    - host
 # ---
 # apiVersion: "cilium.io/v2"
 # kind: CiliumNetworkPolicy
