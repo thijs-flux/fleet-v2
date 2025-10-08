@@ -11,6 +11,10 @@ spec:
   - toEndpoints:
     - matchLabels:
         "k8s:io.kubernetes.pod.namespace": monitoring
+  - toEntities:
+    - host
+    - remote-node
+    - kube-apiserver
   ingress:
   - fromEndpoints:
     - matchLabels:
