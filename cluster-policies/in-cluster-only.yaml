@@ -17,3 +17,4 @@ spec:
         "k8s:io.kubernetes.pod.namespace": monitoring
   - fromEntities:
     - host
+    - kube-apiserver
