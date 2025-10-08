@@ -65,6 +65,10 @@ spec:
   - fromEntities:
     - cluster   
     - host
+  egress:
+  - toEntities:
+    - cluster   
+    - host
 # ---
 # apiVersion: "cilium.io/v2"
 # kind: CiliumNetworkPolicy
