@@ -24,3 +24,21 @@ spec:
     - host
     - kube-apiserver
     - health
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-within-namespace
+  namespace: apps
+spec:
+  endpointSelector:
+    matchLabels: 
+      k8s:io.kubernetes.pod.namespace: apps
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": apps
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": apps
