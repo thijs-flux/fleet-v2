@@ -15,3 +15,5 @@ spec:
   - fromEndpoints:
     - matchLabels:
         "k8s:io.kubernetes.pod.namespace": monitoring
+  - fromEntities:
+    - host
