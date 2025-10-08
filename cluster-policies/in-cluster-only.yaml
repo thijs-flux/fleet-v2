@@ -36,9 +36,9 @@ spec:
       k8s:io.kubernetes.pod.namespace: apps
   egress:
   - toEndpoints:
-      matchLabels:
+    - matchLabels:
         k8s:io.kubernetes.pod.namespace: apps
   ingress:
   - fromEndpoints:
-      matchLabels:
+    - matchLabels:
         k8s:io.kubernetes.pod.namespace: apps
