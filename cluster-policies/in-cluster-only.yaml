@@ -1,61 +1,17 @@
 ---
 apiVersion: "cilium.io/v2"
-kind: CiliumClusterwideNetworkPolicy
-metadata:
-  name: deny-ingress
-spec:
-  endpointSelector:
-    matchLabels:
-      {}
-  ingress:
-    - fromEntities:
-      - kube-apiserver
-    - fromEndpoints:
-      - matchLabels:
-          namespace: flux-system
-    - fromEndpoints:
-      - matchLabels:
-          namespace: kube-system
-  ingressDeny:
-    - fromEntities:
-      - world
----
-apiVersion: "cilium.io/v2"
-kind: CiliumClusterwideNetworkPolicy
-metadata:
-  name: allow-external-access
-spec:
-  endpointSelector:
-    matchLabels:
-      reachable: "external"
-  ingress:
-  - fromEntities:
-    - world
----
-apiVersion: "cilium.io/v2"
-kind: CiliumClusterwideNetworkPolicy
-metadata:
-  name: allow-cluster-access
-spec:
-  endpointSelector:
-    matchLabels:
-      reachable: "cluster"
-  ingress:
-  - fromEntities:
-    - cluster
----
-apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: monitoring
+  name: allow-within-namespace
   namespace: monitoring
 spec:
   endpointSelector:
-    matchLabels:
-      {}
+    matchLabels: {}
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": monitoring
   ingress:
-    - fromEndpoints:
-      - matchLabels:
-          component: monitoring
-    - fromEntities:
-      - host
+  - fromEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": monitoring
