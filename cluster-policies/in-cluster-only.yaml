@@ -54,6 +54,8 @@ spec:
     matchLabels:
       {}
   ingress:
-  - fromEndpoints:
-    - matchLabels:
-        component: monitoring
+    - fromEndpoints:
+      - matchLabels:
+          component: monitoring
+    - fromEntities:
+      - host
