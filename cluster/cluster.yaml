@@ -21,8 +21,6 @@ metadata:
   name: nfs-provisioner
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: networking
   interval: 1h
   retryInterval: 2m
   timeout: 10m
@@ -39,8 +37,6 @@ metadata:
   name: monitoring-controllers
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: nfs-provisioner
   interval: 1h
   retryInterval: 2m
   timeout: 5m
@@ -75,8 +71,6 @@ metadata:
   name: apps
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: monitoring-configs
   interval: 1h
   retryInterval: 2m
   timeout: 10m
@@ -93,8 +87,6 @@ metadata:
   name: routing
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: apps
   interval: 1h
   retryInterval: 2m
   timeout: 10m
