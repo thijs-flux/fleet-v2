@@ -14,6 +14,10 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./networking
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-gpg
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -112,20 +116,3 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./cluster-policies
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: wireguard-conf-secret
-  namespace: flux-system
-spec:
-  interval: 10m0s
-  path: ./networking/wireguard
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-gpg
