@@ -120,7 +120,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./networking/wireguard/config
+  path: ./networking/wireguard/config.yaml
   prune: true
   sourceRef:
     kind: GitRepository
