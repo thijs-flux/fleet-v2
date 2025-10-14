@@ -1,10 +1,6 @@
 terraform {
   required_version = ">= 1.7"
   required_providers {
-    minikube = {
-      source  = "scott-the-programmer/minikube"
-      version = "~> 0.5"
-    }
     flux = {
       source  = "fluxcd/flux"
       version = "1.6.4"
@@ -31,59 +27,28 @@ terraform {
       source = "hashicorp/kubernetes"
       version = "2.38.0"
     }
-
   }
 }
-
-##########################################
-### Provider settings                  ### 
-##########################################
-provider "minikube" {
-  kubernetes_version = "v1.33.0"
-}
 provider "kubernetes" {
-  host = minikube_cluster.docker.host
-  client_certificate =  minikube_cluster.docker.client_certificate
-  client_key = minikube_cluster.docker.client_key
-  cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
+  host = var.host
+  client_certificate =  var.client_certificate
+  client_key = var.client_key
+  cluster_ca_certificate = var.cluster_ca_certificate
 }
 provider "helm" {
   kubernetes = {
-    host = minikube_cluster.docker.host
-    client_certificate =  minikube_cluster.docker.client_certificate
-    client_key = minikube_cluster.docker.client_key
-    cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
+    host = var.host
+    client_certificate =  var.client_certificate
+    client_key = var.client_key
+    cluster_ca_certificate = var.cluster_ca_certificate
   }
-  
-}
-provider "kubectl" {
-  host = minikube_cluster.docker.host
-
-  client_certificate     = minikube_cluster.docker.client_certificate
-  client_key             = minikube_cluster.docker.client_key
-  cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
-  load_config_file       = false
-}
-##########################################
-### Cluster definition                 ### 
-##########################################
-resource "minikube_cluster" "docker" {
-  driver       = "docker"
-  cluster_name = "minikube"
-  nodes        = var.nodes
-}
-variable "nodes" {
-  description = "The amount of nodes in the cluster"
-  type        = number
-  default     = 1
 }
 ##########################################
 ### Flux startup procedure             ### 
 ##########################################
 # These all need to happen in order, which is a bit ugly. 
-# We first need the namespace, in which we will install the helm chart.
-# There is an alternative provider that calls flux bootstrap, but the flux 
-# operator approach has the benefit that this updates flux automatically.
+# The helm release installs half of the flux system.
+# The deployment and crd's can then be used to run flux.
 resource "kubernetes_namespace" "flux_system" {
   metadata {
     name = "flux-system"
@@ -92,11 +57,8 @@ resource "kubernetes_namespace" "flux_system" {
     ignore_changes = [metadata]
   }
 }
-# The helm release installs half of the flux system.
-# The deployment and crd's can then be used to run flux.
 resource "helm_release" "flux_operator" {
-  depends_on = [minikube_cluster.docker]
-
+  depends_on = [ kubernetes_namespace.flux_system, var.cluster ]
   name       = "flux-operator"
   namespace  = "flux-system"
   repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
@@ -135,7 +97,6 @@ locals {
   gateway-crds     = slice(local.gateway-crds-raw, 1, length(local.gateway-crds-raw))
 }
 resource "kubectl_manifest" "gateway-crd" {
-  depends_on = [minikube_cluster.docker]
   count      = length(local.gateway-crds)
   yaml_body  = local.gateway-crds[count.index]
 }
@@ -144,7 +105,7 @@ resource "kubectl_manifest" "gateway-crd" {
 # This links to the actual git repo and branch, and starts flux. 
 resource "kubectl_manifest" "flux" {
   depends_on = [helm_release.flux_operator, kubectl_manifest.gateway-crd, kubernetes_secret.token]
-  yaml_body = file("${path.module}/cluster/flux.yaml")
+  yaml_body = file("../../cluster/flux.yaml")
 }
 # Bit of a hack: we apply the metallb release explicitly as well.
 # The way flux gets started from terraform involves a dry-run, which fails as the metallb helm chart involves crd's which are not loaded in the dry-run.
@@ -159,7 +120,7 @@ resource "kubernetes_namespace" "networking" {
 }
 # The release file also contains the repository, so we need to split that.
 data "kubectl_file_documents" "metallb" {
-    content = file("${path.module}/networking/metallb/release.yaml")
+    content = file("../../networking/metallb/release.yaml")
 }
 resource "kubectl_manifest" "metallb" {
   depends_on = [kubectl_manifest.flux, kubernetes_namespace.networking]
