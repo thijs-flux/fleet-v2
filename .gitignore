@@ -3,3 +3,5 @@ bin/
 .terraform.*
 .terraform/
 terraform.tfstate*
+.*.tfvars
+kubeconfig

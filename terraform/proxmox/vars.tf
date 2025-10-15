@@ -1,0 +1,3 @@
+variable "sops_secret" {
+  
+}
