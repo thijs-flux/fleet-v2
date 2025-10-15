@@ -11,11 +11,11 @@ spec:
         - name: nfs-client-provisioner
           env:
             - name: NFS_SERVER
-              value: 192.168.58.1
+              value: 10.51.100.21
             - name: NFS_PATH
               value: /Share
       volumes:
         - name: nfs-client-root
           nfs:
-            server: 192.168.58.1
+            server: 10.51.100.21
             path: /Share
