@@ -1,3 +1,3 @@
 output "ip_addresses" {
-    value = [for vm in proxmox_virtual_environment_vm.talos_vm: vm.ipv4_addresses]
+    value = flatten([for vm in module.vms.ip_addresses: [for addrs in vm: addrs if length(addrs) > 0 && addrs[0] != "127.0.0.1" ]])
 }
