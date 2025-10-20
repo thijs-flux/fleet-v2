@@ -1,9 +1,7 @@
 variable "control_node_count" {
-    type = "int"
   
 }
 variable "worker_node_count" {
-    type = "int"
   
 }
 variable "sops_secret" {
