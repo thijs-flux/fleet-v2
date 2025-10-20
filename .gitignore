@@ -5,3 +5,4 @@ bin/
 terraform.tfstate*
 .*.tfvars
 kubeconfig
+secret
