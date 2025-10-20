@@ -34,7 +34,6 @@ locals {
 
 data "talos_machine_configuration" "control" {
   depends_on = [ module.vms ]
-  for_each = local.control_ips
   cluster_name     = var.cluster_name
   machine_type     = "controlplane"
   cluster_endpoint = "https://${local.endpoint}:6443"
@@ -50,7 +49,6 @@ data "talos_machine_configuration" "control" {
   ]
 }
 data "talos_machine_configuration" "worker" {
-  for_each = local.worker_ips
   cluster_name     = var.cluster_name
   machine_type     = "worker"
   cluster_endpoint = "https://${local.endpoint}:6443"
