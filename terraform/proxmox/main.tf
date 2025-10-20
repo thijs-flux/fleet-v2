@@ -28,7 +28,6 @@ locals {
   control_ips = toset(slice(module.vms.ip_addresses,0,var.control_node_count))
   worker_ips = toset(slice(module.vms.ip_addresses,var.control_node_count+1,length(module.vms.ip_addresses)))
   endpoint = module.vms.ip_addresses[0]
-
 }
 
 
@@ -68,7 +67,7 @@ data "talos_client_configuration" "this" {
   depends_on = [ module.vms ]
   cluster_name         = var.cluster_name
   client_configuration = talos_machine_secrets.this.client_configuration
-  nodes                = [ module.vms.ip_addresses]
+  nodes                = module.vms.ip_addresses
 }
 
 resource "talos_machine_configuration_apply" "control" {
