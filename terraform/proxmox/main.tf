@@ -33,7 +33,6 @@ locals {
 
 
 data "talos_machine_configuration" "control" {
-  depends_on = [ module.vms ]
   cluster_name     = var.cluster_name
   machine_type     = "controlplane"
   cluster_endpoint = "https://${local.endpoint}:6443"
@@ -65,6 +64,7 @@ data "talos_machine_configuration" "worker" {
 }
 
 data "talos_client_configuration" "this" {
+  depends_on = [ module.vms ]
   cluster_name         = var.cluster_name
   client_configuration = talos_machine_secrets.this.client_configuration
   nodes                = [ module.vms.ip_addresses]
