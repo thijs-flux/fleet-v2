@@ -13,24 +13,31 @@ terraform {
 
 resource "talos_machine_secrets" "this" {}
 
-variable "control_addres" {
-  default="134.221.51.161"
+module "vms" {
+  source = "./talos_vm"
+  vm_count = var.control_node_count + var.worker_node_count 
+  vm_id = var.vm_id
+  pm_addres = var.pm_addres
+  pm_token_id = var.pm_token_id
+  pm_token_secret = var.pm_token_secret
+  pm_username = var.pm_username
+  pm_node_name = var.pm_node_name
 }
-variable "worker_addres" {
-  default="134.221.51.162"
+
+locals {
+  control_ips = slice(module.vms.ip_addresses,0,var.control_node_count)
+  worker_ips = slice(module.vms.ip_addresses,var.control_node_count+1,length(module.vms.ip_addresses))
+  endpoint = local.control_ips[0]
 }
-variable "gateway" {
-  default = "134.221.51.1"
-}
-variable "cluster_name" {
-  default = "cluster"
-}
+
 
 
 data "talos_machine_configuration" "control" {
+  depends_on = [ module.vms ]
+  for_each = local.control_ips
   cluster_name     = var.cluster_name
   machine_type     = "controlplane"
-  cluster_endpoint = "https://${var.control_addres}:6443"
+  cluster_endpoint = "https://${local.endpoint}:6443"
   machine_secrets  = talos_machine_secrets.this.machine_secrets
   config_patches = [
     yamlencode({
@@ -43,9 +50,10 @@ data "talos_machine_configuration" "control" {
   ]
 }
 data "talos_machine_configuration" "worker" {
+  for_each = local.worker_ips
   cluster_name     = var.cluster_name
   machine_type     = "worker"
-  cluster_endpoint = "https://${var.worker_addres}:6443"
+  cluster_endpoint = "https://${local.endpoint}:6443"
   machine_secrets  = talos_machine_secrets.this.machine_secrets
   config_patches = [
     yamlencode({
@@ -61,25 +69,27 @@ data "talos_machine_configuration" "worker" {
 data "talos_client_configuration" "this" {
   cluster_name         = var.cluster_name
   client_configuration = talos_machine_secrets.this.client_configuration
-  nodes                = [var.control_addres, var.worker_addres]
+  nodes                = [ module.vms.ip_addresses]
 }
 
 resource "talos_machine_configuration_apply" "control" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.control.machine_configuration
-  node                        = var.control_addres
+  for_each = local.control_ips
+  node                        = each.value
 }
 resource "talos_machine_configuration_apply" "worker" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
-  node                        = var.worker_addres
+  for_each = local.worker_ips
+  node                        = each.value
 }
 
 resource "talos_machine_bootstrap" "control" {
   depends_on = [
     talos_machine_configuration_apply.control
   ]
-  node                 = var.control_addres
+  node                 = local.endpoint
   client_configuration = talos_machine_secrets.this.client_configuration
 }
 
@@ -88,7 +98,10 @@ resource "talos_cluster_kubeconfig" "this" {
   depends_on = [talos_machine_bootstrap.control]
 
   client_configuration = talos_machine_secrets.this.client_configuration
-  node                 = var.control_addres
+  node                 = local.endpoint
+}
+output "endpoint" {
+  value = local.endpoint
 }
 resource "local_file" "kubeconfig" {
   content  = talos_cluster_kubeconfig.this.kubeconfig_raw

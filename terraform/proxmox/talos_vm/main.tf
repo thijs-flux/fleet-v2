@@ -6,15 +6,6 @@ terraform {
     }
   }
 }
-# resource "proxmox_virtual_environment_file" "talos" {
-#   datastore_id = "local"
-#   node_name    = var.node_name
-#   content_type = "iso"
-#   source_file {
-#     path      = "talos-${var.talos_version}.qcow2"
-#     file_name = "talos-${var.talos_version}.img"
-#   }
-# }
 provider "proxmox" {
   # Configuration options
   endpoint = var.pm_addres
@@ -27,7 +18,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   name        = "${var.name}-${count.index}"
   description = "Managed by Terraform"
   tags        = []
-  node_name = var.node_name
+  node_name = var.pm_node_name
   vm_id     = var.vm_id + count.index
   agent {
     enabled = true
@@ -51,7 +42,6 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
 
   disk {
     datastore_id = "nvme"
-    # import_from  = "local:iso/talos-11-2-metal-amd64.qcow2.iso"#proxmox_virtual_environment_file.talos.id
     interface    = "scsi0"
     iothread     = true
     ssd          = true
@@ -65,12 +55,6 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   }
 
   initialization {
-    # ip_config {
-    #   ipv4 {
-    #     address = "dhcp"#var.ip_adress
-    #     gateway = var.gateway
-    #   }
-    # }
     user_account {
       username = "talos"
       password = "disabled"
@@ -89,10 +73,4 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   }
 
   serial_device {}
-
-#   virtiofs {
-#     mapping = "data_share"
-#     cache = "always"
-#     direct_io = true
-#   }
 }

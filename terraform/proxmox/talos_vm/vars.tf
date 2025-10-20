@@ -1,7 +1,7 @@
 variable "name" {
     default = "zts-k8s-thijs" 
 }
-variable "node_name" {
+variable "pm_node_name" {
     
 }
 variable "vm_id" {
