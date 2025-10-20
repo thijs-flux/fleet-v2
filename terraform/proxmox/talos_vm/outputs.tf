@@ -1,3 +1,3 @@
 output "ip_addresses" {
-    value = proxmox_virtual_environment_vm.talos_vm.ipv4_addreses
+    value = [for vm in proxmox_virtual_environment_vm: vm.talos_vm.ipv4_addresses[0]]
 }
