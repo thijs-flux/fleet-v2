@@ -25,9 +25,10 @@ module "vms" {
 }
 
 locals {
-  control_ips = slice(module.vms.ip_addresses,0,var.control_node_count)
-  worker_ips = slice(module.vms.ip_addresses,var.control_node_count+1,length(module.vms.ip_addresses))
-  endpoint = local.control_ips[0]
+  control_ips = toset(slice(module.vms.ip_addresses,0,var.control_node_count))
+  worker_ips = toset(slice(module.vms.ip_addresses,var.control_node_count+1,length(module.vms.ip_addresses)))
+  endpoint = module.vms.ip_addresses[0]
+
 }
 
 
