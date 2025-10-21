@@ -27,6 +27,10 @@ terraform {
       source = "hashicorp/kubernetes"
       version = "2.38.0"
     }
+    cilium = {
+      source = "littlejo/cilium"
+      version = "0.3.2"
+    }
   }
 }
 provider "kubernetes" {
@@ -53,9 +57,33 @@ provider "kubectl" {
   config_path = var.config_path
   
 }
+# provider "cilium" {
+#   config_path = var.config_path
+# }
 ##########################################
 ### Flux startup procedure             ### 
 ##########################################
+resource "kubernetes_namespace" "networking" {
+  metadata {
+    name = "networking"
+  }
+  lifecycle {
+    ignore_changes = [metadata]
+  }
+}
+# resource "cilium" "cluster" {
+#   set = [
+#     "ipam.mode=kubernetes",
+#     "kubeProxyReplacement=true",
+#     "securityContext.capabilities.ciliumAgent={CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}",
+#     "securityContext.capabilities.cleanCiliumState={NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}",
+#     "cgroup.autoMount.enabled=false",
+#     "cgroup.hostRoot=/sys/fs/cgroup",
+#     "k8sServiceHost=localhost",
+#     "k8sServicePort=6443",
+#     "namespace=networking"
+#   ]
+# }
 # These all need to happen in order, which is a bit ugly. 
 # The helm release installs half of the flux system.
 # The deployment and crd's can then be used to run flux.
