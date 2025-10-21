@@ -128,6 +128,15 @@ resource "local_file" "kubeconfig" {
   filename = "${path.module}/kubeconfig"
 }
 
+provider "cilium" {
+  config_path = "${path.module}/kubeconfig"
+}
+resource "cilium" "cluster" {
+  set = [
+    "ipam.mode=kubernetes",
+  ]
+}
+
 module "cluster"{
   source = "../cluster"
   client_certificate = null
