@@ -15,7 +15,7 @@ spec:
     - cluster
     toPorts:
     - ports:
-      - port: "8443"
+      - port: "6443"
         protocol: "TCP"
 ---
 apiVersion: "cilium.io/v2"

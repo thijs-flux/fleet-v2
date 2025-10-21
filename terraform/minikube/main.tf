@@ -14,11 +14,7 @@ resource "minikube_cluster" "docker" {
   driver       = "docker"
   cluster_name = "minikube"
   nodes        = var.nodes
-}
-variable "nodes" {
-  description = "The amount of nodes in the cluster"
-  type        = number
-  default     = 1
+  apiserver_port = 6443
 }
 module "cluster"{
     source = "../cluster"
@@ -27,4 +23,6 @@ module "cluster"{
   cluster_ca_certificate = minikube_cluster.docker.cluster_ca_certificate
   host = minikube_cluster.docker.host
   cluster = minikube_cluster.docker
+  sops_secret = var.sops_secret
+  config_path = null
 }
