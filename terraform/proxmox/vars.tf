@@ -37,3 +37,6 @@ variable "pm_token_id" {
 variable "pm_token_secret" {
   
 }
+variable "nfs_server_addr" {
+  
+}

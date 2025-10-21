@@ -103,7 +103,25 @@ resource "kubernetes_secret" "gpg" {
   data = {
     "sops.asc" = var.sops_secret
   }
-
+}
+resource "kubernetes_secret" "api_server" {
+  metadata {
+    name = "api-server-addr"
+    namespace = "networking"
+  }
+  data = {
+    "k8sServiceHost" = var.api_server_addr
+  }
+}
+resource "kubernetes_secret" "nfs_server" {
+  metadata {
+    name = "nfs-server-addr"
+    namespace = "nfs-provisioner"
+  }
+  data = {
+    server = var.nfs_server_addr
+    value = var.nfs_server_addr
+  }
 }
 # Apply the custom resource definitions for the gateway API.
 # These are pulled from the github source; there is no official/well-maintained helm chart.

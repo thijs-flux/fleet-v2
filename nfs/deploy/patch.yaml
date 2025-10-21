@@ -11,11 +11,13 @@ spec:
         - name: nfs-client-provisioner
           env:
             - name: NFS_SERVER
-              value: 10.51.100.21
+              secret:
+                secretName: nfs-server-addr
             - name: NFS_PATH
               value: /Share
       volumes:
         - name: nfs-client-root
           nfs:
-            server: 10.51.100.21
+            secret:
+              secretName: nfs-server-addr
             path: /Share
