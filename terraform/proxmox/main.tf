@@ -143,7 +143,7 @@ module "cluster"{
   client_key = null
   cluster_ca_certificate = null
   config_path = "${path.module}/kubeconfig"
-  host = local.endpoint
+  host = null
   cluster = talos_cluster_kubeconfig.this
   sops_secret = var.sops_secret
 }
