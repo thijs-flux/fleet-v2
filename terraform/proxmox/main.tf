@@ -50,6 +50,13 @@ data "talos_machine_configuration" "control" {
           image = "factory.talos.dev/metal-installer/e133d2d977b8029e7cc26def87d5673d727c4451bc796518542db49c2aa4eb1d:v1.11.3"  
         }
       }
+      cluster = {
+        network = {
+          cni = {
+            name = "none"
+          }
+        }
+      }
     })
   ]
 }
@@ -64,6 +71,13 @@ data "talos_machine_configuration" "worker" {
         install = {
           disk = "/dev/sda"
           image = "factory.talos.dev/metal-installer/e133d2d977b8029e7cc26def87d5673d727c4451bc796518542db49c2aa4eb1d:v1.11.3"  
+        }
+      }
+      cluster = {
+        network = {
+          cni = {
+            name = "none"
+          }
         }
       }
     })

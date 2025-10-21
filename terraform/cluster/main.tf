@@ -148,3 +148,12 @@ resource "kubectl_manifest" "metallb" {
   yaml_body = each.value
   validate_schema = false # otherwise we get some errors about metallb not reaching some local address for validation
 }
+data "kubectl_file_documents" "cilium" {
+    content = file("../../networking/metallb/release.yaml")
+}
+resource "kubectl_manifest" "cilium" {
+  depends_on = [kubectl_manifest.flux, kubernetes_namespace.networking]
+  for_each = data.kubectl_file_documents.cilium.manifests
+  yaml_body = each.value
+  validate_schema = false # otherwise we get some errors about metallb not reaching some local address for validation
+}
