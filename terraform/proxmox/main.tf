@@ -8,6 +8,10 @@ terraform {
       source = "bpg/proxmox"
       version = "0.85.0"
     }
+    cilium = {
+      source = "littlejo/cilium"
+      version = "0.3.2"
+    }
   }
 }
 
