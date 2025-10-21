@@ -136,6 +136,7 @@ provider "cilium" {
   config_path = "${path.module}/kubeconfig"
 }
 resource "cilium" "cluster" {
+  depends_on = [ local_file.kubeconfig ]
   set = [
     "ipam.mode=kubernetes",
   ]
