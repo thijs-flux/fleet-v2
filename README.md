@@ -52,3 +52,6 @@ If starting from a clean slate (i.e. no cluster deployed) make sure to delete th
 If the state suggests a cluster exists the kubectl provider will try to work with the kube api (which does not exist without a cluster) or otherwise contact non-existing sockets.
 This can happen when powering down the machine (and thus the cluster) without destroying the terraform state properly (i.e. `terraform destroy -var ...` with the same variables as starting the cluster).
 These errors can list some addresses being unavailable, or some GRPC provider error.
+
+### Talos
+Find the ISO at the [Talos image factory](https://factory.talos.dev/?arch=amd64&cmdline=-talos.halt_if_installed&cmdline-set=true&extensions=-&extensions=siderolabs%2Fqemu-guest-agent&platform=metal&target=metal&version=1.11.3).

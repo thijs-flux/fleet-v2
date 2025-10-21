@@ -26,10 +26,15 @@ module "vms" {
 
 locals {
   control_ips = toset(slice(module.vms.ip_addresses,0,var.control_node_count))
-  worker_ips = toset(slice(module.vms.ip_addresses,var.control_node_count+1,length(module.vms.ip_addresses)))
+  worker_ips = toset(slice(module.vms.ip_addresses,var.control_node_count,length(module.vms.ip_addresses)))
   endpoint = module.vms.ip_addresses[0]
 }
-
+output "control_ips" {
+  value = local.control_ips
+}
+output "worker_ips" {
+  value = local.worker_ips
+}
 
 
 data "talos_machine_configuration" "control" {
@@ -42,6 +47,7 @@ data "talos_machine_configuration" "control" {
       machine = {
         install = {
           disk = "/dev/sda"
+          image = "factory.talos.dev/metal-installer/e133d2d977b8029e7cc26def87d5673d727c4451bc796518542db49c2aa4eb1d:v1.11.3"  
         }
       }
     })
@@ -57,6 +63,7 @@ data "talos_machine_configuration" "worker" {
       machine = {
         install = {
           disk = "/dev/sda"
+          image = "factory.talos.dev/metal-installer/e133d2d977b8029e7cc26def87d5673d727c4451bc796518542db49c2aa4eb1d:v1.11.3"  
         }
       }
     })
@@ -85,7 +92,8 @@ resource "talos_machine_configuration_apply" "worker" {
 
 resource "talos_machine_bootstrap" "control" {
   depends_on = [
-    talos_machine_configuration_apply.control
+    talos_machine_configuration_apply.control,
+    talos_machine_configuration_apply.worker
   ]
   node                 = local.endpoint
   client_configuration = talos_machine_secrets.this.client_configuration
@@ -106,17 +114,13 @@ resource "local_file" "kubeconfig" {
   filename = "${path.module}/kubeconfig"
 }
 
-# provider "kubernetes" {
-#   host = var.ip_addres
-#   config_path = "${path.module}/kubeconfig"
-# }
 module "cluster"{
   source = "../cluster"
   client_certificate = null
   client_key = null
   cluster_ca_certificate = null
   config_path = "${path.module}/kubeconfig"
-  host = null#"https://${var.ip_addres}"
+  host = local.endpoint
   cluster = talos_cluster_kubeconfig.this
   sops_secret = var.sops_secret
 }

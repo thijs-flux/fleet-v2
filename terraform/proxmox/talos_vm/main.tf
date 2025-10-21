@@ -43,7 +43,6 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   disk {
     datastore_id = "nvme"
     interface    = "scsi0"
-    iothread     = true
     ssd          = true
     discard      = "on"
     size         = 10
