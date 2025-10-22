@@ -11,7 +11,11 @@ spec:
         - name: nfs-client-provisioner
           env:
             - name: NFS_SERVER
-              value: "${nfs_server}"
+              # value: "${nfs_server}"
+              valueFrom:
+                configMapKeyRef:
+                  key: nfs_server
+                  name: nfs_server
             - name: NFS_PATH
               value: /Share
       volumes:
@@ -19,7 +23,3 @@ spec:
           nfs:
             server: "${nfs_server}"
             path: /Share
-  postBuild:  
-    substituteFrom:
-      - kind: ConfigMap
-        name: cluster-vars

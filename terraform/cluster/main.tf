@@ -67,6 +67,7 @@ provider "cilium" {
 # These all need to happen in order, which is a bit ugly. 
 # The helm release installs half of the flux system.
 # The deployment and crd's can then be used to run flux.
+# We start by preloading all namespaces.
 data "kubectl_file_documents" "namespaces" {
     content = file("../../cluster/namespaces.yaml")
 }
@@ -74,6 +75,8 @@ resource "kubectl_manifest" "namespaces" {
   for_each = data.kubectl_file_documents.namespaces.manifests
   yaml_body = each.value
 }
+# Start up ciliu. In talos we need this to be able to reach other nodes, which is a bit of a chicken/egg problem with flux.
+# Once flux is started this will be replaced by the version managed by flux.
 resource "cilium" "network"{
   depends_on = [ kubectl_manifest.namespaces ]
   set = [
@@ -86,6 +89,7 @@ resource "cilium" "network"{
     "k8sServicePort=6443",
   ]
 }
+# The git token for communicating with git.
 resource "kubernetes_secret" "token" {
   depends_on = [ kubectl_manifest.namespaces ]
   metadata {
@@ -98,6 +102,7 @@ resource "kubernetes_secret" "token" {
   }
 
 }
+# The gpg key for sops secrets
 resource "kubernetes_secret" "gpg" {
   depends_on = [ kubectl_manifest.namespaces ]
   metadata {
@@ -109,9 +114,10 @@ resource "kubernetes_secret" "gpg" {
   }
 }
 resource "kubernetes_config_map" "cluster_vars" {
+  depends_on = [ kubectl_manifest.namespaces ]
   metadata {
     name = "cluster-vars"
-    namespace = "nfs_provisioner"
+    namespace = "nfs-provisioner"
   }
   data = {
     nfs_server = var.nfs_server_addr
