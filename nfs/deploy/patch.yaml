@@ -11,13 +11,11 @@ spec:
         - name: nfs-client-provisioner
           env:
             - name: NFS_SERVER
-              secret:
-                secretName: nfs-server-addr
+              value: ${nfs_server}
             - name: NFS_PATH
               value: /Share
       volumes:
         - name: nfs-client-root
           nfs:
-            secret:
-              secretName: nfs-server-addr
+            server: ${nfs_server}
             path: /Share

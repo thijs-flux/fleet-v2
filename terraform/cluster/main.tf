@@ -57,33 +57,35 @@ provider "kubectl" {
   config_path = var.config_path
   
 }
-# provider "cilium" {
-#   config_path = var.config_path
-# }
+provider "cilium" {
+  config_path = var.config_path
+  namespace = "networking"
+}
 ##########################################
 ### Flux startup procedure             ### 
 ##########################################
 # These all need to happen in order, which is a bit ugly. 
 # The helm release installs half of the flux system.
 # The deployment and crd's can then be used to run flux.
-resource "kubernetes_namespace" "flux_system" {
-  metadata {
-    name = "flux-system"
-  }
-  lifecycle {
-    ignore_changes = [metadata]
-  }
+data "kubectl_file_documents" "namespaces" {
+    content = file("../../cluster/namespaces.yaml")
 }
-resource "helm_release" "flux_operator" {
-  depends_on = [ kubernetes_namespace.flux_system, var.cluster ]
-  name       = "flux-operator"
-  namespace  = "flux-system"
-  repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
-  chart      = "flux-operator"
-  wait       = true
+resource "kubectl_manifest" "namespaces" {
+  for_each = data.kubectl_file_documents.namespaces.manifests
+  yaml_body = each.value
 }
-# There needs to be a GITHUB_TOKEN environment variable.
-# Flux needs this to communicate with the non-public repo.
+resource "cilium" "network"{
+  depends_on = [ kubectl_manifest.namespaces ]
+  set = [
+    "ipam.mode=kubernetes",
+    "kubeProxyReplacement=true",
+    "securityContext.capabilities.ciliumAgent={CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}",
+    "securityContext.capabilities.cleanCiliumState={NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}",
+    "cgroup.autoMount.enabled=false",
+    "cgroup.hostRoot=/sys/fs/cgroup",
+    "k8sServicePort=6443",
+  ]
+}
 resource "kubernetes_secret" "token" {
   metadata {
     name = "git-token"
@@ -104,25 +106,25 @@ resource "kubernetes_secret" "gpg" {
     "sops.asc" = var.sops_secret
   }
 }
-resource "kubernetes_secret" "api_server" {
+resource "kubernetes_config_map" "cluster_vars" {
   metadata {
-    name = "api-server-addr"
-    namespace = "networking"
+    name = "cluster-vars"
   }
   data = {
-    "k8sServiceHost" = var.api_server_addr
+    nfs_server = var.nfs_server_addr
   }
 }
-resource "kubernetes_secret" "nfs_server" {
-  metadata {
-    name = "nfs-server-addr"
-    namespace = "nfs-provisioner"
-  }
-  data = {
-    server = var.nfs_server_addr
-    value = var.nfs_server_addr
-  }
+resource "helm_release" "flux_operator" {
+  depends_on = [ cilium.network, var.cluster, kubernetes_secret.gpg, kubernetes_secret.token, kubernetes_config_map.cluster_vars ]
+  name       = "flux-operator"
+  namespace  = "flux-system"
+  repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
+  chart      = "flux-operator"
+  wait       = true
 }
+# There needs to be a GITHUB_TOKEN environment variable.
+# Flux needs this to communicate with the non-public repo.
+
 # Apply the custom resource definitions for the gateway API.
 # These are pulled from the github source; there is no official/well-maintained helm chart.
 data "http" "gateway-crd" {
@@ -155,29 +157,21 @@ resource "kubectl_manifest" "flux" {
 # Bit of a hack: we apply the metallb release explicitly as well.
 # The way flux gets started from terraform involves a dry-run, which fails as the metallb helm chart involves crd's which are not loaded in the dry-run.
 # We also need the networking namespace to be present for this, which should get started by flux, but may not be alive yet when the flux provider is done.
-resource "kubernetes_namespace" "networking" {
-  metadata {
-    name = "networking"
-  }
-  lifecycle {
-    ignore_changes = [metadata]
-  }
-}
 # The release file also contains the repository, so we need to split that.
-data "kubectl_file_documents" "metallb" {
-    content = file("../../networking/metallb/release.yaml")
-}
-resource "kubectl_manifest" "metallb" {
-  depends_on = [kubectl_manifest.flux, kubernetes_namespace.networking]
-  for_each = data.kubectl_file_documents.metallb.manifests
-  yaml_body = each.value
-  validate_schema = false # otherwise we get some errors about metallb not reaching some local address for validation
-}
+# data "kubectl_file_documents" "metallb" {
+#     content = file("../../networking/metallb/release.yaml")
+# }
+# resource "kubectl_manifest" "metallb" {
+#   depends_on = [kubectl_manifest.flux, kubernetes_namespace.networking]
+#   for_each = data.kubectl_file_documents.metallb.manifests
+#   yaml_body = each.value
+#   validate_schema = false # otherwise we get some errors about metallb not reaching some local address for validation
+# }
 data "kubectl_file_documents" "cilium" {
     content = file("../../networking/metallb/release.yaml")
 }
 resource "kubectl_manifest" "cilium" {
-  depends_on = [kubectl_manifest.flux, kubernetes_namespace.networking]
+  depends_on = [kubectl_manifest.flux]
   for_each = data.kubectl_file_documents.cilium.manifests
   yaml_body = each.value
   validate_schema = false # otherwise we get some errors about metallb not reaching some local address for validation

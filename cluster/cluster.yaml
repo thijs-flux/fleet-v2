@@ -34,6 +34,14 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./nfs
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-gpg
+  postBuild:  
+    substituteFrom:
+      - kind: ConfigMap
+        name: cluster-vars
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
