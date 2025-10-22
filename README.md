@@ -12,7 +12,6 @@ See the proxmox vars.tf
 # nfs_server_addr
 The NFS serveer
 
-
 ### Repository layout
 
 # /cluster
@@ -55,11 +54,19 @@ If the state suggests a cluster exists the kubectl provider will try to work wit
 This can happen when powering down the machine (and thus the cluster) without destroying the terraform state properly (i.e. `terraform destroy -var ...` with the same variables as starting the cluster).
 These errors can list some addresses being unavailable, or some GRPC provider error.
 
+If setting up using proxmox there can be an issue where it cannot reach a kubernetes api on localhost. 
+This is probably due to the terraform providers being instantiated before the kubeconfig is created.
+You can restart the apply command in this case, as the kubeconfig has been created at this point.
+
 ## Useful proxmox targets
 In case of errors it can be useful to run terraform with a specific target.
 The usefule ones are:
  - module.vms: spin up proxmox vms (these are non-bootstrapped talos)
  - local_file.kubeconfig: bootstraps talos and gives a kubeconfig
+
+## Cluster destruction
+Terraform can destroy the cluster as well; in the case of proxmox it can mess up the order.
+Once the proxmox VMs are gone (i.e. module.vms.proxmox... destruction complete) you can safely delete the tfstate files.
 
 ### Talos
 Find the ISO at the [Talos image factory](https://factory.talos.dev/?arch=amd64&cmdline=-talos.halt_if_installed&cmdline-set=true&extensions=-&extensions=siderolabs%2Fqemu-guest-agent&platform=metal&target=metal&version=1.11.3).
