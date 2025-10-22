@@ -26,8 +26,8 @@ module "vms" {
 }
 
 locals {
-  control_ips = toset(slice(module.vms.ip_addresses,0,var.control_node_count))
-  worker_ips = toset(slice(module.vms.ip_addresses,var.control_node_count,length(module.vms.ip_addresses)))
+  control_ips = slice(module.vms.ip_addresses,0,var.control_node_count)
+  worker_ips = slice(module.vms.ip_addresses,var.control_node_count,length(module.vms.ip_addresses))
   endpoint = module.vms.ip_addresses[0]
 }
 output "control_ips" {
@@ -95,14 +95,16 @@ data "talos_client_configuration" "this" {
 resource "talos_machine_configuration_apply" "control" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.control.machine_configuration
-  for_each = local.control_ips
-  node                        = each.value
+  # for_each = local.control_ips
+  count = var.control_node_count
+  node                        = local.control_ips[count.index]
 }
 resource "talos_machine_configuration_apply" "worker" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
-  for_each = local.worker_ips
-  node                        = each.value
+  # for_each = local.worker_ips
+  count = var.worker_node_count
+  node                        = local.worker_ips[count.index]
 }
 
 resource "talos_machine_bootstrap" "control" {
@@ -137,7 +139,7 @@ module "cluster"{
   cluster_ca_certificate = null
   config_path = "${path.module}/kubeconfig"
   host = null
-  cluster = talos_cluster_kubeconfig.this
+  cluster = local_file.kubeconfig
   sops_secret = var.sops_secret
   nfs_server_addr = var.nfs_server_addr
   api_server_addr = local.endpoint

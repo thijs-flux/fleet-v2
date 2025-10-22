@@ -87,6 +87,7 @@ resource "cilium" "network"{
   ]
 }
 resource "kubernetes_secret" "token" {
+  depends_on = [ kubectl_manifest.namespaces ]
   metadata {
     name = "git-token"
     namespace = "flux-system"
@@ -98,6 +99,7 @@ resource "kubernetes_secret" "token" {
 
 }
 resource "kubernetes_secret" "gpg" {
+  depends_on = [ kubectl_manifest.namespaces ]
   metadata {
     name = "sops-gpg"
     namespace = "flux-system"
