@@ -67,5 +67,5 @@ spec:
   - toEntities:
     - world
   ingress:
-  - toEntities:
+  - fromEntities:
     - world

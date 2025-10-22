@@ -19,3 +19,7 @@ spec:
           nfs:
             server: "${nfs_server}"
             path: /Share
+  postBuild:  
+    substituteFrom:
+      - kind: ConfigMap
+        name: cluster-vars

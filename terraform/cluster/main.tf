@@ -111,6 +111,7 @@ resource "kubernetes_secret" "gpg" {
 resource "kubernetes_config_map" "cluster_vars" {
   metadata {
     name = "cluster-vars"
+    namespace = "nfs_provisioner"
   }
   data = {
     nfs_server = var.nfs_server_addr
