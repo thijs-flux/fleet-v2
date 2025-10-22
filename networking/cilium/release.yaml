@@ -61,7 +61,7 @@ spec:
       autoMount:
         enabled: true
       hostRoot: /sys/fs/cgroup
-    k8sServiceHost: localhost
+    # k8sServiceHost: localhost
     # secret:
     #   secretName: api-server-addr
     k8sServicePort: "6443"
