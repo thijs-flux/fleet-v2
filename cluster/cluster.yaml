@@ -36,8 +36,8 @@ spec:
   path: ./nfs
   postBuild:  
     substituteFrom:
-      - kind: ConfigMap
-        name: cluster-vars
+      - kind: Secret
+        name: cluster-vars-secret
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
