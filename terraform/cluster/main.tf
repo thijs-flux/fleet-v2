@@ -113,18 +113,20 @@ resource "kubernetes_secret" "gpg" {
     "sops.asc" = var.sops_secret
   }
 }
-resource "kubernetes_config_map" "cluster_vars" {
+# This is not that secret, but injecting a configmap would not work and this did.
+resource "kubernetes_secret" "cluster_vars" {
   depends_on = [ kubectl_manifest.namespaces ]
   metadata {
-    name = "cluster-vars"
-    namespace = "nfs-provisioner"
+    name = "cluster-vars-secret"
+    namespace = "flux-system"
   }
   data = {
     nfs_server = var.nfs_server_addr
+    addresspool = var.addresspool
   }
 }
 resource "helm_release" "flux_operator" {
-  depends_on = [ cilium.network, var.cluster, kubernetes_secret.gpg, kubernetes_secret.token, kubernetes_config_map.cluster_vars ]
+  depends_on = [ cilium.network, var.cluster, kubernetes_secret.gpg, kubernetes_secret.token, kubernetes_secret.cluster_vars ]
   name       = "flux-operator"
   namespace  = "flux-system"
   repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"

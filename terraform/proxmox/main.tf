@@ -158,4 +158,5 @@ module "cluster"{
   sops_secret = var.sops_secret
   nfs_server_addr = var.nfs_server_addr
   api_server_addr = local.endpoint
+  addresspool = var.addresspool
 }

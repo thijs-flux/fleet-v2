@@ -7,3 +7,4 @@ variable "config_path" { }
 variable "sops_secret" { }
 variable "api_server_addr" { }
 variable "nfs_server_addr" { }
+variable "addresspool" { }
